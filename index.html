@@ -1,1 +1,215 @@
-<h1>flozeyn8 Web Sitesi Canlı Yayında!</h1>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sini Zerf Online</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        
+        h1 { color: #d4af37; margin: 5px 0; font-size: 1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); text-align: center; }
+
+        /* AŞAMA 1: GİRİŞ EKRANI */
+        #girisEkrani {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #2c3e50, #111);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .giris-box {
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #d4af37;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+        }
+        .giris-box input {
+            width: 100%; padding: 12px; margin: 10px 0;
+            border-radius: 25px; border: 1px solid #555;
+            background: #222; color: white; text-align: center;
+            font-size: 1rem; box-sizing: border-box;
+        }
+        .divider { color: #aaa; margin: 10px 0; font-size: 0.9rem; }
+
+        /* AŞAMA 2: LOBİ BEKLEME ODASI EKRANI */
+        #lobiBeklemeEkrani {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #1a1a1a;
+            z-index: 998;
+            display: none; /* JavaScript ile görünür yapılacak */
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .oda-kodu-kutusu {
+            background: #2c3e50;
+            border: 2px dashed #d4af37;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            width: 90%;
+            max-width: 340px;
+            margin: 20px 0;
+        }
+        .oda-kodu-kutusu h2 { margin: 0; color: #fff; font-size: 1.1rem; }
+        .oda-kodu-kutusu .kod { font-size: 2.2rem; font-weight: bold; color: #d4af37; letter-spacing: 2px; margin: 10px 0; }
+        .oda-kodu-kutusu p { margin: 0; font-size: 0.85rem; color: #bbb; }
+
+        /* 3vs3 Lobi Oyuncu Listeleri */
+        .teams-container {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 340px;
+            margin: 0 0 15px 0;
+            gap: 10px;
+        }
+        .team-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 8px;
+            flex: 1;
+            font-size: 0.8rem;
+            border-top: 4px solid #3498db;
+        }
+        .team-box.team-b { border-top-color: #e74c3c; }
+        .team-box h4 { margin: 0 0 5px 0; font-size: 0.85rem; text-align: center;}
+        
+        .player-slot { 
+            padding: 5px; background: rgba(0,0,0,0.4); 
+            margin-bottom: 4px; border-radius: 4px; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .player-slot.empty { 
+            border: 1px dashed #555; background: transparent; 
+            color: #d4af37; cursor: pointer; text-align: center; justify-content: center;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #2ecc71; }
+
+        /* AŞAMA 3: OYUN MASASI ALANI */
+        #oyunAlani {
+            width: 100%;
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+        }
+        .score-board {
+            background: linear-gradient(135deg, #2c3e50, #1a252f);
+            border: 2px solid #d4af37; padding: 8px; border-radius: 12px;
+            margin-bottom: 15px; width: 90%; max-width: 360px; text-align: center;
+        }
+        .score-team { display: flex; justify-content: space-around; font-size: 1.1rem; font-weight: bold; }
+        .team-a-text { color: #3498db; }
+        .team-b-text { color: #e74c3c; }
+        
+        .sini-konteyner { width: 100%; display: flex; justify-content: center; margin-bottom: 15px; }
+        .sini {
+            background: radial-gradient(circle, #4a2711 20%, #2b1407 70%, #150a03 100%);
+            border: 10px solid #b87333; border-radius: 50%;
+            width: 82vw; height: 82vw; max-width: 320px; max-height: 320px;
+            position: relative; box-shadow: 0 12px 30px rgba(0,0,0,0.8);
+            transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .zerf {
+            position: absolute;
+            background: radial-gradient(circle at 35% 35%, #fff2a3, #d4af37 60%, #aa8010 100%);
+            border: 2px solid #8a6506; width: 44px; height: 44px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 0.9rem; color: #332200;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5); transition: transform 0.3s, background 0.3s;
+            -webkit-tap-highlight-color: transparent; left: calc(50% - 22px); top: calc(50% - 22px);
+        }
+        .zerf.open { background: radial-gradient(circle, #8a4f23, #4a2711) !important; color: #fff !important; }
+        .zar { width: 12px; height: 12px; background: white; border: 1px solid #333; position: absolute; display: none; border-radius: 2px; }
+
+        .controls { width: 90%; max-width: 360px; text-align: center; margin-top: auto; padding-bottom: 10px; }
+        #info-text { font-size: 0.95rem; color: #d4af37; margin: 8px 0; min-height: 35px; font-weight: bold;}
+        
+        button { border: none; padding: 14px; font-size: 1rem; font-weight: bold; border-radius: 25px; cursor: pointer; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .btn-green { background-color: #2ecc71; color: white; }
+        .btn-blue { background-color: #3498db; color: white; }
+        .btn-orange { background-color: #e67e22; color: white; margin-top: 15px;}
+        button:active { transform: scale(0.97); }
+
+        /* PERDE ANİMASYONU */
+        .black-curtain { 
+            position: fixed; top: -100%; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(to bottom, #111 90%, #222 100%);
+            border-bottom: 5px solid #d4af37; z-index: 999; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box;
+            transition: top 0.8s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+        .black-curtain.active { top: 0; }
+        .black-curtain h2 { color: #e74c3c; font-size: 1.5rem; margin-bottom: 10px; }
+        .black-curtain button { width: auto; padding: 10px 25px; background-color: #3498db; }
+    </style>
+</head>
+<body>
+
+    <!-- [AŞAMA 1] ANA GİRİŞ EKRANI -->
+    <div id="girisEkrani">
+        <h1 style="font-size: 2rem; margin-bottom: 20px;">لعبة الصينية<br>Sini Zerf Online</h1>
+        <div class="giris-box">
+            <h2 style="color: white; margin-top:0;">MAÇ MASASI</h2>
+            <input type="text" id="username" placeholder="Oyuncu Adınızı Yazın" value="Oyuncu_1">
+            
+            <!-- Doğrudan HTML seviyesinde tetiklenen kilit kırmalı buton -->
+            <button type="button" class="btn-green" onclick="document.getElementById('lobiBeklemeEkrani').style.display='flex'; document.getElementById('girisEkrani').style.display='none'; lobiKodunuUret();">+ Yeni Lobi Oluştur</button>
+            
+            <div class="divider">veya mevcut odaya girin</div>
+            <input type="text" id="roomInput" placeholder="Oda Kodunu Girin">
+            <button type="button" class="btn-blue" onclick="document.getElementById('lobiBeklemeEkrani').style.display='flex'; document.getElementById('girisEkrani').style.display='none'; lobiKodunuKopyala();">🚪 Odaya Katıl</button>
+        </div>
+    </div>
+
+    <!-- [AŞAMA 2] LOBİ BEKLEME ODASI EKRANI -->
+    <div id="lobiBeklemeEkrani">
+        <h1>Lobi Bekleme Odası</h1>
+        
+        <div class="oda-kodu-kutusu">
+            <h2>ODA KODU</h2>
+            <div class="kod" id="bekleme-oda-kodu">#ZRF-0000</div>
+            <p>Bu kodu arkadaşlarınıza göndererek odaya çağırın.</p>
+        </div>
+
+        <div style="width: 100%; max-width: 340px; text-align: center; margin-bottom: 15px;">
+            <span id="lobi-oyuncu-sayisi" style="color: #e74c3c; font-weight: bold; font-size: 1.1rem;">Oyuncu: 1 / 6</span>
+            <p style="font-size: 0.8rem; color: #aaa; margin: 5px 0 0 0;">(Masa için boş koltuklara basarak 6 kişiye tamamlayın)</p>
+        </div>
+
+        <div class="teams-container">
+            <div class="team-box">
+                <h4 class="team-a-text">A Takımı</h4>
+                <div class="player-slot"><span id="lobi-p1-name">👑 Siz</span> <div class="status-dot"></div></div>
+                <div class="player-slot empty" onclick="hizliOyuncuEkle(this, 'A', 2)">+ Arkadaş Ekle</div>
+                <div class="player-slot empty" onclick="hizliOyuncuEkle(this, 'A', 3)">+ Arkadaş Ekle</div>
+            </div>
+            <div class="team-box team-b">
+                <h4 class="team-b-text">B Takımı</h4>
+                <div class="player-slot empty" onclick="hizliOyuncuEkle(this, 'B', 1)">+ Arkadaş Ekle</div>
+              
